@@ -6,7 +6,7 @@ VirtualDataList (VDL) is a set of widgets and components used to create customiz
 
 A few common widgets, including the base widget in this system, are included in this package.  The VirtualList and VirtualDataList widgets are the base widgets (the latter depends on dojo.data stores). These include an essentially arbitrary set of features (in reality what is being worked on or tested at any modment).  In practice, a developer would generally extend one of these components minimally including the set of base components they want their widget to consume.  There are a number of ways these components can be combined to be optimal for a number of different situations, and the goal is to provide the minimal framework so that these components can be tied together to achieve that ooptimum.  Currently included in this package is an example PagedDataList, which allows a table/list to be viewed by page rather than scrolling.  
 
-Example Pages can be found in the [tests](dmachi/virtual-datalist/tree/master/tests/)
+Example Pages can be found in the [tests](tree/master/tests/)
 
 ## Overview
 
@@ -39,5 +39,5 @@ The lists themselves are instantiated and used as any other Dijit widget, here i
 
     <div id='VirtualDataList1' dojoType="dojoc.dmachi.VirtualDataList" store="testDataStore" title="Test Store" structure="dynStruct" estimatedRowHeight="31"></div> 
 
-More detailed architecture documentation and notes can be found in the [docs](dmachi/virtual-datalist/tree/master/lib/docs).
+More detailed architecture documentation and notes can be found in the [docs](tree/master/lib/docs).
 
