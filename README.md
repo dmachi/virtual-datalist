@@ -37,39 +37,6 @@ VirtualLists are passed a structure definition which is used to control various 
 
 The lists themselves are instantiated and used as any other Dijit widget, here is a declarative example
 
+More detailed architecture documentation and notes can be found in the [docs/ docs]
     <div id='VirtualDataList1' dojoType="dojoc.dmachi.VirtualDataList" store="testDataStore" title="Test Store" structure="dynStruct" estimatedRowHeight="31"></div> 
-
-## Architecture    
-
-Architecture detail and notes for the VDL and related components.
-
-### Base Widget - VirtualList and VirtualDataList
-
-### Component Manager
-
-### Components
-
-#### Scrollbar
-
-#### Row/DataRow
-
-#### Header/Footer
-
-#### KeyboardManager
-
-#### DnD
-
-#### DynamicStructure
-
-#### State Manager
-
-#### Selection Manager
-
-#### Cache Manager
-
-
-## Creating Custom Virtual Widgets
-
-## Additional Info/Links
-
 
