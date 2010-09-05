@@ -39,5 +39,5 @@ The lists themselves are instantiated and used as any other Dijit widget, here i
 
     <div id='VirtualDataList1' dojoType="dojoc.dmachi.VirtualDataList" store="testDataStore" title="Test Store" structure="dynStruct" estimatedRowHeight="31"></div> 
 
-More detailed architecture documentation and notes can be found in the [docs](virtual-datalist/tree/master/lib/docs).
+More detailed architecture documentation and notes can be found in the [docs](virtual-datalist/tree/master/docs).
 
