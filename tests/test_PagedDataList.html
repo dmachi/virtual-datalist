@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+	"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>DataList Test</title>
+	<!-- only needed for test files: -->
+	<style type="text/css">
+		@import "../../../dojo/resources/dojo.css";
+	</style>
+
+	<!-- required: the default dijit theme: -->
+	<link id="themeStyles" rel="stylesheet" href="../../../dijit/themes/tundra/tundra.css">
+	<link href="../resources/multiAccordion.css" rel="stylesheet">
+	<link href="../resources/virtualList.css" rel="stylesheet">
+
+	<!-- custom styles for the new widgets -->
+	<style type="text/css">
+		html, body { height: 100%; width: 100%; padding: 0; border: 0;overflow: hidden; }
+		#main { height: 100%; width: 100%; border: 0; }
+
+		.virtualList .hover td {
+			background: #dedeff;
+		}
+
+
+		.virtualList .selected TD{
+			background: yellow;
+		}
+
+		.virtualRow {
+			vertical-align: top;
+		}
+
+		.virtualRow > td {
+			border: 0px;
+			border-bottom: 1px solid gray;
+			border-right: 1px solid lightgray;
+			line-height: 30px;
+			height: 80px;
+			padding-left: 5px;
+			white-space: nowrap;
+			overflow: hidden;	
+			background: #ccffdd;
+		}
+
+		.virtualRow > td {
+		        border: none;
+		        background: url(images/tabEnabled_rotated.png) #FFF repeat-y left;
+		        border-right: 1px solid #789EB4;
+		        border-bottom: 1px solid #789EB4;
+		        padding: 0 1px 0 0;
+		}
+
+		.virtualHeader table {
+			width: 100%;
+		}
+
+		.virtualHeader {
+			table-layout: fixed;
+		}
+
+		.virtualHeader th, .virtualListWaste {
+		        border-width: 1px;
+		        padding-bottom: 0px;
+		        color: #000 !important;
+		        font-weight: bold;
+		        background: #B3CFDF url("../../../dijit/themes/aristo/images/titleBar.png") repeat-x top left;
+		        border-color: #789EB4 #789EB4 #789EB4 #DDF0FB;
+		        border-top: none;
+		        border-bottom: none;
+		        padding: 9px 3px !important;
+		        text-shadow: 0 1px 0 #e5f1f8;
+		}
+
+		.virtualRow .descColumn ,
+		.virtualRow .sliderColumn {
+			width: 100px;
+		}
+
+
+		.virtualRow .urlColumn,
+		.virtualRow  .numberColumn {
+			width: 50px;
+		}
+
+		TD.pagedDataListController {
+			height: 25px;	
+		}
+
+		TD.pagedDataListController div span:last-child {
+			float: right;	
+		}
+
+
+		#dataConfig label,
+		#dataConfig input {
+			display: block;
+			width: 100%;
+		}
+	</style>
+	<script type="text/javascript" djConfig="parseOnLoad:true,popup: true, isDebug:true" src="../../../dojo/dojo.js"></script>
+	<script type="text/javascript">
+		//dojo.require("dijit.dijit"); // optimize: load dijit layer
+		dojo.require("dijit.layout.BorderContainer");
+		dojo.require("dijit.layout.ContentPane");
+		dojo.require("dijit.layout.TabContainer");
+		dojo.require("dojo.parser");
+		dojo.require("dojoc.dmachi.PagedDataList");
+		dojo.require("dojo.DeferredList");
+		dojo.require("dojoc.dmachi.TestStore");
+		dojo.require("dijit.form.TextBox");
+		dojo.require("dijit.form.NumberTextBox");
+		dojo.require("dijit.form.NumberSpinner");
+		dojo.require("dijit.form.Slider");
+			//ws.attr("store", dataWidgetsStore);
+		dojo.require("dojo.dnd.Source");
+
+		var storeProfile = {
+			template: {
+				id: "${index}",
+				name: "ITEM ${index}",
+				shortDesc: "${index} Short Description",
+				url: "http://foo.bar.com${index}.html"
+			},
+			genNumericData: function(index,item){
+				item.X = Math.round(Math.random() * 100);
+				item.Y = Math.round(Math.random() * 100);
+				item.Z = Math.round(Math.random() * 100);
+				item.volume = Math.round(Math.random() * 100);
+			}
+		}
+
+		testDataStore = new dojoc.dmachi.TestStore({resultCount: 100, latency: -1, profile: storeProfile});
+
+	   	dynStruct={
+	                header: {
+				className: "virtualHeader"
+			},
+
+			row: {
+				className: "virtualRow",
+				columns: [
+					{field: "id", label: "ID", className: "numberColumn"},
+					{field: "name", label: "Name", className: "descColumn"},
+					{field: "shortDesc", label: "Short Desc", type: "dojoc.dmachi.virtual.types.Widget", options: {dojoType: 'dijit.form.TextBox'}, className: "descColumn"},
+					{field: "X", label: "X", type: "dojoc.dmachi.virtual.types.Widget", options: {dojoType: 'dijit.form.NumberSpinner', style: "width: 60px;"}, className: "numberColumn"},
+					{field: "Y", label: "Y", type: "dojoc.dmachi.virtual.types.Widget", options: {dojoType: 'dijit.form.NumberSpinner', style: "width: 60px;"}, className: "numberColumn"},
+					{field: "Z", label: "Z", type: "dojoc.dmachi.virtual.types.Widget", options: {dojoType: 'dijit.form.NumberSpinner', style: "width: 60px;"}, className: "numberColumn"},
+					{field: "volume", label: "Volume", type: "dojoc.dmachi.virtual.types.Widget", options: {dojoType: 'dijit.form.HorizontalSlider', style: "width: 100%;", minimum: 0, maximum: 100, steps: 10}, className: "sliderColumn"}, 
+					{field: "url",label: "URL", type: "dojoc.dmachi.virtual.types.tag.A", options: {property: "name"}, className: "urlColumn"}
+	                        ]
+	                },
+
+			footer: {
+				className: "virtualFooter"
+			}
+	        }
+
+	        function creator(item){
+			var n= dojo.create("div", {innerHTML: "Item " + item.identity});
+			return {node: n, data: item, type: item.type};
+		}
+
+		dojo.addOnLoad(function(){
+			dojo.connect(dijit.byId("VirtualDataList1"), "onVirtualRowClick", function(rowIndex, item, rawEvent){
+				console.log("onVirtualRowClick() ", arguments);
+			});
+		});
+		
+	</script>
+<body class="tundra">
+<!--	<div dojoType="dojoc.dmachi.TestStore" jsId="testDataStore" resultCount="1000" latency="-1" profile="{template:{id:'${index}',name:'ITEM ${index}',desc:'Description',shortDesc:'Short Description'}}"></div> -->
+	<div id="main" dojoType="dijit.layout.BorderContainer" liveSplitters="false">
+		<div id="" dojoType="dijit.layout.ContentPane" title="Test Panel" style="width:300px;" region="left" splitter="true">
+			<div id="c1" creator="creator" dojoType="dojo.dnd.Source" jsId="c1" class="container" style="width: 100%; height: 100%;border: 1px solid green;" accept="DojoDataItem">
+			</div>
+		</div>
+		<div dojoType="dijit.layout.TabContainer" region="center">
+			<div id="dummyPane" dojoType="dijit.layout.ContentPane" title="Dummy Empty Panel"></div>
+			<div id='VirtualDataList1' dojoType="dojoc.dmachi.PagedDataList" store="testDataStore" title="Test Store" structure="dynStruct" estimatedRowHeight="31"></div> 
+<!--			<div id='dataList1' dojoType="dojoc.dmachi.VirtualDataList" store="testDataStore" title="dataList1" structure="dynStruct"></div>  -->
+<!--			<div id='dataList3' dojoType="dojoc.dmachi.VirtualDataList" store="testDataStore" title="dataList3"></div> -->
+		</div>
+		<!--
+		<div id="" dojoType="dijit.layout.ContentPane" title="Test Panel" style="width:300px;" region="right" splitter="true">
+			<div id="c2" dojoType="dojo.dnd.Source" jsId="c2" class="container" style="width: 100%; height: 100%;border: 1px solid green;" accept="'DojoDataItem','text']">
+				<li class="dojoDndItem">Item 1</li>
+				<li class="dojoDndItem">Item 2</li>
+				<li class="dojoDndItem">Item 3</li>
+
+			</div>
+		</div>
+		-->	
+	</div>
+</body>
+</html>
+

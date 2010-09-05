@@ -1,0 +1,262 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+	"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>DataList Test</title>
+	<!-- only needed for test files: -->
+	<style type="text/css">
+		@import "../../../dojo/resources/dojo.css";
+	</style>
+
+	<!-- required: the default dijit theme: -->
+	<link id="themeStyles" rel="stylesheet" href="../../../dijit/themes/tundra/tundra.css">
+	<link href="../resources/multiAccordion.css" rel="stylesheet">
+	<link href="../resources/virtualList.css" rel="stylesheet">
+
+	<!-- custom styles for the new widgets -->
+	<style type="text/css">
+		html, body { height: 100%; width: 100%; padding: 0; border: 0;overflow: hidden; }
+		#main { height: 100%; width: 100%; border: 0; }
+
+		.virtualList .hover td {
+			background: #dedeff;
+		}
+
+
+		.virtualList .selected TD{
+			background: yellow;
+		}
+
+		.virtualRow {
+			vertical-align: top;
+		}
+
+		.virtualRow > td {
+			border: 0px;
+			border-bottom: 1px solid gray;
+			border-right: 1px solid lightgray;
+			line-height: 30px;
+			height: 80px;
+			padding-left: 5px;
+			white-space: nowrap;
+			overflow: hidden;	
+			background: #ccffdd;
+		}
+
+		.virtualRow > td {
+		        border: none;
+		        background: url(images/tabEnabled_rotated.png) #FFF repeat-y left;
+		        border-right: 1px solid #789EB4;
+		        border-bottom: 1px solid #789EB4;
+		        padding: 0 1px 0 0;
+		}
+
+		.virtualHeader table {
+			width: 100%;
+		}
+
+		.virtualHeader {
+			table-layout: fixed;
+		}
+
+		.virtualHeader th, .virtualListWaste {
+		        border-width: 1px;
+		        padding-bottom: 0px;
+		        color: #000 !important;
+		        font-weight: bold;
+		        background: #B3CFDF url("../../../dijit/themes/aristo/images/titleBar.png") repeat-x top left;
+		        border-color: #789EB4 #789EB4 #789EB4 #DDF0FB;
+		        border-top: none;
+		        border-bottom: none;
+		        padding: 9px 3px !important;
+		        text-shadow: 0 1px 0 #e5f1f8;
+		}
+
+		.virtualRow .descColumn ,
+		.virtualRow .sliderColumn {
+			width: 100px;
+		}
+
+
+		.virtualRow .urlColumn,
+		.virtualRow  .numberColumn {
+			width: 50px;
+		}
+
+
+		#dataConfig label,
+		#dataConfig input {
+			display: block;
+			width: 100%;
+		}
+	</style>
+	<script type="text/javascript" djConfig="parseOnLoad:true,popup: true, isDebug:true" src="../../../dojo/dojo.js"></script>
+	<script type="text/javascript">
+		dojo.require("dojo.parser");
+		dojo.require("dijit.layout.BorderContainer");
+		dojo.require("dijit.layout.ContentPane");
+		dojo.require("dijit.layout.TabContainer");
+
+		//vdl require
+		dojo.require("dojoc.dmachi.VirtualDataList");
+
+		//test data store
+		dojo.require("dojoc.dmachi.TestStore");
+
+		// Profile for the TestStore to use to generate data items.  For this example,
+		// Items will have an id, name, and email property.
+		var storeProfile = {
+			template: {
+				id: "${index}",
+				name: "ITEM ${index}",
+				email: "${index}@test.com"
+			}
+		}
+
+		//instantiate the test data store.  Latency -1 will treat this store synchronously (like 
+		//ItemFileReadStore.   Increasing the number to 0 or above will switch it to a async store
+		//with each request delayed by 'latency' ms.
+		testDataStore = new dojoc.dmachi.TestStore({resultCount: 100, latency: -1, profile: storeProfile});
+
+
+		//Example Row Class with custom html and updating methods
+		dojo.declare("customRow", dojoc.dmachi.virtual.DataRow, {
+
+
+			// This is just a simple template to represent the html within a row.
+			// In reality our Row is <tr><td>TEMPLATE</td></tr>, basically a single
+			// column row. Notice also that we are setting things up so that we can 
+			// use event bubbling and to avoid specifically connecting and maintaining
+			// a reference to a childNodes.  Instead we preidentify nodes we will want
+			// to access, by giving them an id prefixed by this widgets Id. Note that care
+			// should be taken to ensure the html has a static height.
+			//
+			templateString: '<div><span id="${id}_name">Name</span>&nbsp; Email: <span id="${id}_email"></span><br><div style="height:25px;" id="${id}_description"><div>',
+	
+			// this function builds the html structure of a single cell.  It creates a <td> element,
+			// uses string substitution on this.templatestring (context this), and then
+			// innerHTMLs the td with this content.  Finally the node is appended to the row's
+			// <tr>.  This logic can be changed to build this single column in any way 
+			// desired, keeping in mind that ultimately you will have to implement
+			// a corresponding updateColumnValue()
+			//
+			// While we would recommend avoiding widgets within the row itself, in some cases
+			// it may be desirable.  In that case you could create those widgets in this
+			// function as well, and track the instances, and ensure their proper destruction.
+		
+			buildColumn: function(columnStructure){
+				var id = columnStructure.field || columnStructure.label;
+				if (!id) {
+					throw new Error("Row column structure must either define a label or a field");
+				}
+	
+				var td = this.columns[id] = dojo.doc.createElement("td");
+				td.innerHTML=dojo.string.substitute(this.templateString,this) 
+				if (columnStructure.className){
+					dojo.addClass(td, columnStructure.className);
+				}
+				this.columnStructure[id]=columnStructure;
+				this.domNode.appendChild(td);	
+			},
+	
+			//This function is called when the column must be updated.  In our case we define the
+			//column's field name as "*", which doesn't actually exist on the data item.  This
+			//forces the row to shortcut any field transformations and update column will be passed
+			//"*" as the col value, and the row as the val.  In our case there is only one row, so
+			//we dont' really care about the passed values, and need only use this as a trigger
+			//which causes our update logic.  
+			//
+			//Since we have defined each subnode with a unique id, we simply grab a reference
+			//and update their content.  If widgets have been created, the should be updated 
+			//according to their api as well. This function override should strive to update
+			//the cells content in the most efficient way possible.  The combination of the
+			//template, css, and this function should be trying to update only the data.  The DOM
+			//and CSS should be structured that the modifications done by this minimize changes 
+			//that force larger relayouts()  For example, make sure the whole row has a fixed heigh
+			//rather than allowing it to grow and then trimming it back to size.
+			updateColumnValue: function(col, val){
+				dojo.byId(this.id+"_name").innerHTML=this.getValue("name");
+				dojo.byId(this.id+"_email").innerHTML=this.getValue("email");
+			}
+
+			//
+			// The VDL uses an inbetween model for event bubbling. Since there are a limited 
+			// number of rows and the rows themselves don't change, the Row classes themselves
+			// are responsible for capturing the events within that row.  The VDL connects
+			// to any functions beginning with "on".  So basically the html within a single
+			// row should be maintained via event bubbling, and it should process those
+			// events appropriate and/or pass them on to the parent. The following properties
+			// show the default connections that are made for each row's domNode and where
+			// they are mapped too.  Note that indiscriminately removing these may have
+			// impact elsewhere as these exposed events may be consumed by other parts/plugins
+			// of the vdl.  The primary point is to show that these are the events we are already
+			// capturing and with these alone we can already capture most of the activity
+			// of any inner content.  See the initConnects() method of Row.js for details
+			// and override it to provide your own logic for connections and mapping.
+			//
+			//connectEventsMap: {
+			//	onclick: "onClick",
+			//	onmouseover: "onMouseOver",
+			//	onmouseout: "onMouseOut",
+			//	onmouseenter: "onMouseEnter",
+			//	onmouseleave: "onMouseLeave",
+			//	onmousedown: "onMouseDown",
+			//	onmouseup: "onMouseUp",
+			//	onmousemove: "onMouseMove",
+			//	onfocus: "onFocus",
+			//	onblur: "onBlur"
+			//}, 
+			//
+			//	connectEvents: [
+			//	{node: "domNode", events: ["onclick", "onmouseover", "onmouseout", "onmouseenter", "onmouseleave","onmousedown","onmouseup","onmousemove","onfocus","onblur"]}
+			//],
+	
+		});
+
+
+
+
+		// This is a custom DataList extension which is nearly the same
+		// as the default VirtualDataList.  The only differences are the modified
+		// list of base components (including the custom customRow above) and a
+		// different default structure.  The base components here will need
+		// to be adjusted to employ those components a particular VDL needs.
+		dojo.declare("customDataListTest", dojoc.dmachi.VirtualDataList, {
+			baseComponents: [
+				["dojoc.dmachi.virtual.KeyboardManager", {}],
+				["dojoc.dmachi.virtual.StateManager", {}],
+				["dojoc.dmachi.virtual.SelectionManager", {}],
+				["dojoc.dmachi.virtual.Scrollbar", {}, "scrollContainer"],
+				["customRow", {}]
+			],
+
+			defaultStructure: {
+				row: {
+					className: "listRow",
+					columns: [
+						{field: "*"}
+					]
+				}
+			}
+		});
+
+		dojo.addOnLoad(function(){
+			dojo.connect(dijit.byId("VirtualDataList1"), "onVirtualRowClick", function(rowIndex, item, rawEvent){
+				console.log("onVirtualRowClick() ", arguments);
+			});
+		});
+		
+	</script>
+<body class="tundra">
+<!--	<div dojoType="dojoc.dmachi.TestStore" jsId="testDataStore" resultCount="1000" latency="-1" profile="{template:{id:'${index}',name:'ITEM ${index}',desc:'Description',shortDesc:'Short Description'}}"></div> -->
+	<div id="main" dojoType="dijit.layout.BorderContainer" liveSplitters="false">
+		<div id="" dojoType="dijit.layout.ContentPane" title="Test Panel" style="width:300px;" region="left" splitter="true">
+		</div>
+		<div dojoType="dijit.layout.TabContainer" region="center">
+			<div id="dummyPane" dojoType="dijit.layout.ContentPane" title="Dummy Empty Panel"></div>
+			<div id='VirtualDataList1' dojoType="customDataListTest" store="testDataStore" title="Test Store" estimatedRowHeight="31"></div> 
+		</div>
+	</div>
+</body>
+</html>
+

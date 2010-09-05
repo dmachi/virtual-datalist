@@ -1,0 +1,302 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+	"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>DataList Test</title>
+	<!-- only needed for test files: -->
+	<style type="text/css">
+		@import "../../../dojo/resources/dojo.css";
+	</style>
+
+	<!-- required: the default dijit theme: -->
+	<link id="themeStyles" rel="stylesheet" href="../../../dijit/themes/tundra/tundra.css">
+	<link href="../resources/multiAccordion.css" rel="stylesheet">
+	<link href="../resources/virtualList.css" rel="stylesheet">
+
+	<!-- custom styles for the new widgets -->
+	<style type="text/css">
+		html, body { height: 100%; width: 100%; padding: 0; border: 0; }
+		#main { height: 100%; width: 100%; border: 0; }
+
+		.virtualRow {
+			vertical-align: top;
+		}
+
+		.virtualRow td {
+			border: 0px;
+			border-bottom: 1px solid gray;
+			border-right: 1px solid lightgray;
+			line-height: 30px;
+			padding-left: 5px;
+			white-space: nowrap;
+			overflow: hidden;	
+			background: #ccffdd;
+		}
+
+		.virtualHeader th {
+			line-height: 60px;
+			border-right: 1px solid black;
+        		border-bottom: 2px solid black;
+		        font-size: 1.2em;
+		        background: #dedede;
+		}
+
+		#dataConfig label,
+		#dataConfig input {
+			display: block;
+			width: 100%;
+		}
+	</style>
+	<script type="text/javascript" djConfig="parseOnLoad:true,isDebug:true" src="../../../dojo/dojo.js"></script>
+	<script type="text/javascript">
+		//dojo.require("dijit.dijit"); // optimize: load dijit layer
+		dojo.require("dijit.layout.BorderContainer");
+		dojo.require("dijit.layout.ContentPane");
+		dojo.require("dojo.data.ItemFileReadStore");
+		dojo.require("dijit.layout.TabContainer");
+		dojo.require("dijit.layout.AccordionContainer");
+		//dojo.require("dojoc.dmachi.MultiAccordion");
+		//dojo.require("dojoc.dmachi.DraggableAccordionButton");
+		dojo.require("dojo.parser");
+		dojo.require('dijit.form.NumberSpinner');
+		dojo.require("dijit.form.Button");
+		dojo.require("dojoc.dmachi.VirtualDataList");
+		dojo.require("dijit.form.FilteringSelect");
+		dojo.require("dijit.form.TextBox");
+		dojo.require("dijit.ProgressBar");
+		dojo.require("dojo.DeferredList");
+		dojo.require("dojoc.dmachi.TestStore");
+		var data = [];
+		nonStoreData = [];
+	
+		var numTestItems = 100;	
+
+		function createItem(num, prefix){
+			var item = {
+				id: num + "",
+				name: (prefix || "Item") + " " + num,
+				desc: "Description of " + (prefix||"Item") + " " + num,
+				propA: "propA" + num,
+				propB: "propB" + num,
+				propC: "propB" + num,
+				propD: "propC" + num,
+				propE: "propD" + num
+			};
+			return item;
+		}
+
+		for(var i=0; i<numTestItems; i++){
+			var item = createItem(i);
+			var cloned = dojo.clone(item);
+			data.push(item);
+			nonStoreData.push(cloned);
+		}
+
+		var d = {
+			identity: "id",
+			label: "name",
+			items: data
+		}
+
+		dojo.global.dataStore=new dojo.data.ItemFileReadStore({data: d});
+		completedGroups = 0;
+
+		dojo.addOnLoad(function(){
+        		var dataListStructure={
+		                header: {
+					className: "virtualHeader"
+				},
+
+				row: {
+					className: "virtualRow",
+					columns: [
+						{field: "name", label: "Name", transformers:["dojoc.dmachi.transform.upper"]},
+						{field: "desc", label: "Description", transformers:["dojoc.dmachi.transform.upper"]},
+						{field: "propA", label: "Property A"},
+						{field: "propB", label: "Property B"},
+						{field: "propC", label: "Property C"},
+						{field: "propD", label: "Property D"}
+		                        ]
+		                },
+
+				footer: {
+					className: "virtualFooter"
+				}
+		        }
+	
+			dijit.byId('dataList1').attr('structure', dataListStructure);	
+
+        		var dataListStructure2={
+		                header: {
+					className: "listHeader"
+				},
+
+				row: {
+					className: "listRow",
+					columns: [
+						{field: "name", label: "Name", transformers:["dojoc.dmachi.transform.upper"]},
+						{field: "desc", label: "Description"}
+		                        ]
+		                },
+
+				footer: {
+					className: "listFooter"
+				}
+		        }
+	
+			dijit.byId('dataList2').attr('structure', dataListStructure2);	
+			//dijit.byId('dataList3').attr('structure', dataListStructure2);	
+			var dataWidgets= {
+				identifier: "id",
+				items:[]
+			}
+
+			dojo.query("[store]").forEach(function(node){
+				console.log("Got Store Node: ", node);
+				var id = dojo.attr(node, "id");
+				dataWidgets.items.push({id: id, name: id, dojoType: dojo.attr(node,"dojoType")||"Not Found"});
+			});
+
+			console.log("Items: ", dataWidgets.items.length, dataWidgets.items);	
+			dataWidgetsStore = new dojo.data.ItemFileReadStore({data: dataWidgets});
+			console.log("dataWidgetsStore: ", dataWidgetsStore);
+			var ws=dijit.byId("targetWidget");
+			console.log("selectWidget: ",ws);
+			dojo.connect(dijit.byId("regenerateStore"), "onClick", function(){
+				targetWidget = dijit.byId(dijit.byId("targetWidget").attr('value'));
+				var numItems = parseInt(dijit.byId("numberItems").attr("value")); 
+				var sd  = {items: []};
+				var groups = 100;
+				var groupSize = numItems / groups;
+				pb = dijit.byId("progressBar");
+				mn = dojo.byId("generateMessage");
+				dojo.style(pb.domNode,"display","");
+				dojo.style(mn, "display","");
+				dijit.byId("progressBar").update({indeterminate:false, progress:0,maximum:groups});	
+				completedGroups=0;
+				var defs = [];
+				mn.innerHTML="Generating " + groups + " groups.";
+				for (var i = 0; i< groups ; i++){
+					var start = i * groupSize;
+					var end = start + groupSize;
+					var def=new dojo.Deferred();
+					defs.push(def);	
+					setTimeout(dojo.partial(function(start,end,def){
+						dojo.byId("generateMessage").innerHTML="Generating Items " + start + " to " + end + "...";
+						for (var x=start;x<end;x++){
+							sd.items.push(createItem(x+"", dijit.byId('itemPrefix').attr('value')||"Item"));
+						}	
+						dojo.byId("generateMessage").innerHTML="Generation Complete for Items: " + start + " to " + end + ".";
+						console.log("completeGroups: " + completedGroups + 2);
+						dijit.byId("progressBar").update({progress:(completedGroups+1) });
+						completedGroups+=1;
+						def.callback(true);
+					},start,end,def), i*10);
+				}
+
+				console.log("Num Deferreds: ", defs.length);
+				var dl = new dojo.DeferredList(defs);
+
+				dl.addCallback(function(){
+					mn.innerHTML = "Creating Store. This make take some time for large datasets...";
+					dijit.byId("progressBar").update({"indeterminate": true});
+					console.log("Data: ", sd);	
+					setTimeout(dojo.partial(function(data,targetWidget){
+						console.log("Create the store");
+						console.log(" targetWidget", targetWidget);
+						var newStore = new dojo.data.ItemFileReadStore({data: data});
+						console.log("afterStore");
+						dojo.byId("generateMessage").innerHTML="Creation Complete.</br>. Assigning to " + targetWidget.attr("id");
+						dojo.style(dijit.byId("progressBar").domNode,"display","none");
+						setTimeout(function(){
+							dojo.style(dojo.byId("generateMessage"), "display","none");
+							dojo.byId("generateMessage").innerHTML="";
+						}, 10000);
+						targetWidget.attr("store",newStore);;
+					},sd,targetWidget),250);
+				});	
+			});
+
+			ws.attr("store", dataWidgetsStore);
+
+			dynStore = new dojoc.dmachi.TestStore({resultCount: 1000, latency: -1, profile: { template: {id: "${index}", name: "ITEM ${index}", desc: "Description", shortDesc: "shortDesc"}}});
+
+			dojo.connect(dijit.byId("resultCount"), "onChange", function(val){
+				console.log("TestStore's result count updated to: ", val);
+				dynStore.resultCount = val;
+			});	
+
+			dojo.connect(dijit.byId("requestLatency"), "onChange", function(val){
+				console.log("TestStore's requestLatency updated to: ", val);
+				dynStore.latency= val;
+			});	
+
+			dijit.byId('dataList3').attr('store', dynStore);
+		   		var dynStruct={
+		                header: {
+					className: "virtualHeader"
+				},
+
+				row: {
+					className: "virtualRow",
+					columns: [
+						{field: "id", label: "ID", transformers:["dojoc.dmachi.transform.upper"]},
+						{field: "name", label: "Name", transformers:["dojoc.dmachi.transform.upper"]},
+						{field: "label", label: "Label", transformers:["dojoc.dmachi.transform.upper"]},
+						{field: "shortDescription", label: "Short Desc"}
+		                        ]
+		                },
+
+				footer: {
+					className: "virtualFooter"
+				}
+		        }
+	
+			dijit.byId('dataList3').attr('structure', dynStruct);	
+  
+		});	
+	</script>
+<body class="tundra">
+	<div dojoType="dojo.data.ItemFileReadStore" jsId="continentStore" url="../../../dijit/tests/_data/countries.json"></div>
+	<div id="main" dojoType="dijit.layout.BorderContainer" liveSplitters="false">
+		<div dojoType="dijit.layout.AccordionContainer" region="left" style="width:300px;" splitter="true">
+
+			<div id="testStoreConfig" dojoType="dijit.layout.ContentPane" title="Test Store Live Configuration" style="padding:10px;">
+				<label for="resultCount">Number of items query results should contain (total, not per page):</label><br />
+				<input id="resultCount" dojoType="dijit.form.NumberSpinner" value="25000" constraints="{min:0,max:200000}" /><br />
+				<label for="requestLatency">Request Latency</label><br />
+				<input id="requestLatency" dojoType="dijit.form.NumberSpinner" value="0" constraints="{min:-1,max:10000}" /><br />
+			</div>
+			<div id="dataConfig" dojoType="dijit.layout.ContentPane" title="ItemFileReadStore DataStore Generator" style="padding:10px;">
+				<label for="numberItems">Number of items to generate:</label>
+				<input id="numberItems" dojoType="dijit.form.NumberSpinner" value="25000" constraints="{min:0,max:200000}" /><br />
+				<label for="itemPrefix" >Item Prefix</label><br />
+				<input id="itemPrefix" dojoType="dijit.form.TextBox" value="Prefix_" /><br />
+				<label for="targetWidget">Target Widget</label>
+				<select id="targetWidget" dojoType="dijit.form.FilteringSelect"></select><br />	
+				<div id="regenerateStore" dojoType="dijit.form.Button">Regenerate Data Store</div><br />
+				<div id="progressBar" dojoType="dijit.ProgressBar" style="width: 90%;display:none;"></div>
+				<h1 id="generateMessage" style="display:none;"></h1>	
+			</div>
+			<div id='dataList2' dojoType="dojoc.dmachi.VirtualDataList" store="dataStore" title="dataList2"></div>
+			<div id="" dojoType="dijit.layout.ContentPane" title="Test Panel"></div>
+		</div>
+<!--
+		<div id="accordionShell1a" dojoType="dojoc.dmachi.MultiAccordion" buttonWidget="dojoc.dmachi.DraggableAccordionButton" region="right" style="width:175px;padding:0px;" splitter="true">
+			<div dojoType="dijit.layout.ContentPane" title="Test Data Config"></div>
+			<div dojoType="dijit.layout.ContentPane" title="Test Data Config"></div>
+			<div id='list2' dojoType="dojoc.dmachi.VirtualList" items="nonStoreData" title="list2"></div>
+			<div id='dataList3' dojoType="dojoc.dmachi.VirtualDataList" store="dataStore" title="dataList3" </div>
+			<div dojoType="dijit.layout.ContentPane" title="Test Data Config"></div>
+			<div dojoType="dijit.layout.ContentPane" title="Test Data Config"></div>
+		</div>
+-->
+		<div dojoType="dijit.layout.TabContainer" region="center">
+<!--			<div id='list1' dojoType="dojoc.dmachi.VirtualList" items="nonStoreData" title="list1" selected="true"></div> -->
+			<div id='dataList1' dojoType="dojoc.dmachi.VirtualDataList" store="dataStore" title="dataList1"></div>
+			<div id='dataList3' dojoType="dojoc.dmachi.VirtualDataList" store="dataStore" title="dataList3"></div>
+		</div>
+	</div>
+</body>
+</html>
+
