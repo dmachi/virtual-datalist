@@ -120,11 +120,11 @@ Components can expose additional methods and events.  The above is not a complet
 
    *  createRowComponents() does the work described above, and returns a deferred
 		
-   *  render()
+*  render()
 
-      * Fire 'onStartRender'
+   * Fire 'onStartRender'
 
-      * Based on this.topIndex (index of the first item in the list), request a page of data to render (getDataPage()), return deferrred
+   * Based on this.topIndex (index of the first item in the list), request a page of data to render (getDataPage()), return deferrred
 
    * updateChildren() For Each child, tell it what item it now represents.
 
@@ -135,41 +135,60 @@ Components can expose additional methods and events.  The above is not a complet
 	
 ### Updating Children
 
-    updateChildren(), called from render simply iterates through each child row calling child.set("item", currentItem); The child rows themselves are responsible for updating the html within those rows.
+updateChildren(), called from render simply iterates through each child row calling child.set("item", currentItem); The child rows themselves are responsible for updating the html within those rows.
 
-    ## Events
+## Events
 
-       * Internal Events
-         * onStartRender
-         * onSetColumnWidgets
-         * onSetContentHeight
-         * onEndRender
-         * onStartLayout
-	
-    ## Component Manager
+* Internal Events
+  * onStartRender
+  * onSetColumnWidgets
+  * onSetContentHeight
+  * onEndRender
+  * onStartLayout
 
-    ## Components
+## Component Manager
 
-### Scrollbar
+The Component Manager is a mixin included in the two base widgets.  It provides an infrastructure for components to be instantiated and method for communicating with the core widget and each other.
 
-### Row/DataRow
+''TODO: describe the utilities and conventions used here''
 
-### Header/Footer
+## Components
 
-### KeyboardManager
+*  Scrollbar
 
-### DnD
+   The Scrollbar Component is a controller component.  It should be provided with a domNode by the consuming widget, and will create a native scrollbar inside of this domNode.  The scrollbar essentially works by creating a couple of nested Div 1px wider than the native scrollbar. The inner div (with content &nbsp;) has its height set to number of rows * rowHeight.  This basically creates an empy scrolling container.  As onscroll events happen, the scrollbar component calculates the index that should now be at the top, and calls set("topIndex", id); to scroll to that position. 'In reality it calls set("topIndex", [id, offset]) in order to provide smooth scrolling'
 
-### DynamicStructure
+*  Row/DataRow
+  
+   This class should be a widget and is responsible for representing a single row at any one time.  A number of these rows get created to fill the viewport.  When re-rendering occurs, the container will call set("items", item)  on the row, so it can update the content within.  It should strive to avoid modifying and rerendering when it is not necessary. The base Row class is for non dojo.data aware widgets, while DataRow extends it to support dojo.data items. Custom row classes can (and should!) be used to allow for the most efficient re-rendering process possible.  The standard row classes read the data structure to know how to set themselves up within the widget infrastructure.  For example, by default each field will be a <td></td> in the final row.  A custom row, can be pretty much anything wrapped in <tr><td></td></tr>.  
+  
+   The current implementation has each row handle the processing of its own event, and then fire an event through the parent widget for consumption.  It is also possible, with a bit more work, to remove the per row event handling, and place this on the containing row itself.  Generally speaking, because there is a limit to the number of physical rows and they do not get recreated, the number of connections isnt too bad and not a problem.  The advantage is that it allows for easier identification of subrow events, and allows them to map to the parent in differing ways
 
-### State Manager
+*  Header/Footer
 
-### Selection Manager
+   The Header and Footer components act similiarly to the Row/DataRow components but are used for rendering the header rows and processing and emitting events related to these areas.  
 
-### Cache Manager
+*  KeyboardManager
+ 
+   The KeyboardManager handles all of the keyboard events, potentially normalizing them, and then emits them as internal widget events.  Components are still free to perform their own connections to the widget's various domNodes, however this allows for easier separation and control of the order by which events will run.  Components are wired up in the order they exist within the baseComponents array.
+  
+*  DnD
 
+   DnD controller provides dojo.dnd capabilities to the List widgets. 
 
-# Creating Custom Virtual Widgets
+*  State Manager
+
+   Allows grid meta/state information to be stored in reference to a particular item in the index.  For example, the Selection Manager component, uses the state manager to represent when an item is selected. 
+
+*  Selection Manager
+
+   Manage the state and selection of items in the lists.
+
+##  Creating Custom Virtual Widgets
+
+''TODO: Write this and show some more examples.''
+
+There is a test in [tests](dmachi/virtual-datalist/tree/master/tests)
 
 # Additional Info/Links
 
