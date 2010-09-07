@@ -1,4 +1,4 @@
-#Virtual Data List Architecture
+#VirtualList Architecture Notes
 
 ##Overview
 
