@@ -116,7 +116,7 @@ Components can expose additional methods and events.  The above is not a complet
 
 *  layout()
 
-   The layout method ensures that the correct number of children exist (the number of fully visible rows + 3) by adding or removing from the existing set.  This is an asynchronous process currently to allow for rendering challenges in IE (TODO:see if it performs better making it sync again by inspecting offsetHeight).  An optional (but preferred) optimization for the initial rendering, is to provide the widget with an estimated row height, which allows the creation of all of the children at once.  If for some reason the value of this esitmate is incorrect, the widget will work fine, it will potentially be slightly slower for the initial rendering.  Upon completion of this process, the render() method is called, and finally it fires off an 'onSetViewportHeight' event.
+   The layout method ensures that the correct number of children exist (the number of fully visible rows + 3) by adding or removing from the existing set.  This is an asynchronous process currently to allow for rendering challenges in IE **(TODO:see if it performs better making it sync again by inspecting offsetHeight)**.  An optional (but preferred) optimization for the initial rendering, is to provide the widget with an estimated row height, which allows the creation of all of the children at once.  If for some reason the value of this esitmate is incorrect, the widget will work fine, it will potentially be slightly slower for the initial rendering.  Upon completion of this process, the render() method is called, and finally it fires off an 'onSetViewportHeight' event.
 
    *  createRowComponents() does the work described above, and returns a deferred
 		
@@ -139,18 +139,22 @@ updateChildren(), called from render simply iterates through each child row call
 
 ## Events
 
-* Internal Events
-  * onStartRender
-  * onSetColumnWidgets
-  * onSetContentHeight
-  * onEndRender
-  * onStartLayout
+** TODO Add in the rest of the events **
+
+   * onStartRender
+   * onSetColumnWidgets
+   * onSetContentHeight
+   * onEndRender
+   * onStartLayout
+   * onSetTopIndex
+   * onSetOffset
+   * onSetStructure
 
 ## Component Manager
 
 The Component Manager is a mixin included in the two base widgets.  It provides an infrastructure for components to be instantiated and method for communicating with the core widget and each other.
 
-''TODO: describe the utilities and conventions used here''
+**TODO: describe the utilities and conventions used here**
 
 ## Components
 
@@ -186,10 +190,11 @@ The Component Manager is a mixin included in the two base widgets.  It provides 
 
 ##  Creating Custom Virtual Widgets
 
-''TODO: Write this and show some more examples.''
+**TODO: Write this and show some more examples.**
 
 There is a test in [tests](dmachi/virtual-datalist/tree/master/tests)
 
 # Additional Info/Links
 
+None.
 
