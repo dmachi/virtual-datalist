@@ -81,7 +81,7 @@ Most of the interface is via w.get/set.  The key properties are listed below
 
 *  Instantiation Only
 
- *   estimatedRowHeight 
+   *   estimatedRowHeight 
 
      An estimation of the height of each rows.  During the initial rendering, this value will be used to avoid calculating the height of an actual row.  This allows the correct number of rows to be created on a single pass, improving performance when provided.  It is strictly optional.
 
@@ -90,62 +90,65 @@ Components can expose additional methods and events.  The above is not a complet
 
 
 ### Lifecycle
+
 *  postMixInProperties
 
-Components are initialized in postMixinProperties.  Components can addCallback() onto this.buildRenderingDeferred in order to instantiate dom properties after this.domNode has been created.  Components are defined as an array on baseComponents and extraComponents, with the latter available for runtime addition.
+   Components are initialized in postMixinProperties.  Components can addCallback() onto this.buildRenderingDeferred in order to instantiate dom properties after this.domNode has been created.  Components are defined as an array on baseComponents and extraComponents, with the latter available for runtime addition.
 
 *  buildRendering
 
-This phase creates the base dom structure from a template defined in templateString.  *Note that the template used here currently only does innerHTML and processing of dojoAttachPoints.* After creation of the template/this.domNode, the buildRenderingDeferred is triggered, allowing the components complete and DOM dependent instantiation 
+   This phase creates the base dom structure from a template defined in templateString.  *Note that the template used here currently only does innerHTML and processing of dojoAttachPoints.* After creation of the template/this.domNode, the buildRenderingDeferred is triggered, allowing the components complete and DOM dependent instantiation 
 
 *  postCreate
 
-Setup a default structure (configuration) if one wasn't provided.
+   Setup a default structure (configuration) if one wasn't provided.
 
 *  startup
 
-Allow normal rendering cycle to proceed by triggering resize()
+   Allow normal rendering cycle to proceed by triggering resize()
+
 
 ### Rendering life cycle
 
 *  resize() 
 
-This is the standard LayoutWidget resize method, which triggers a call to layout() only when there is a change to the size of the contentBox.  The current content box settings are stored in this._contentBox
+   This is the standard LayoutWidget resize method, which triggers a call to layout() only when there is a change to the size of the contentBox.  The current content box settings are stored in this._contentBox
 
 *  layout()
 
-The layout method ensures that the correct number of children exist (the number of fully visible rows + 3) by adding or removing from the existing set.  This is an asynchronous process currently to allow for rendering challenges in IE (TODO:see if it performs better making it sync again by inspecting offsetHeight).  An optional (but preferred) optimization for the initial rendering, is to provide the widget with an estimated row height, which allows the creation of all of the children at once.  If for some reason the value of this esitmate is incorrect, the widget will work fine, it will potentially be slightly slower for the initial rendering.  Upon completion of this process, the render() method is called, and finally it fires off an 'onSetViewportHeight' event.
+   The layout method ensures that the correct number of children exist (the number of fully visible rows + 3) by adding or removing from the existing set.  This is an asynchronous process currently to allow for rendering challenges in IE (TODO:see if it performs better making it sync again by inspecting offsetHeight).  An optional (but preferred) optimization for the initial rendering, is to provide the widget with an estimated row height, which allows the creation of all of the children at once.  If for some reason the value of this esitmate is incorrect, the widget will work fine, it will potentially be slightly slower for the initial rendering.  Upon completion of this process, the render() method is called, and finally it fires off an 'onSetViewportHeight' event.
 
- *  createRowComponents() does the work described above, and returns a deferred
+   *  createRowComponents() does the work described above, and returns a deferred
 		
- *  render()
+   *  render()
 
-   * Fire 'onStartRender'
+      * Fire 'onStartRender'
 
-   * Based on this.topIndex (index of the first item in the list), request a page of data to render (getDataPage()), return deferrred
+      * Based on this.topIndex (index of the first item in the list), request a page of data to render (getDataPage()), return deferrred
 
    * updateChildren() For Each child, tell it what item it now represents.
 
    * Based on the size of the children, fire onSetColumnWidths , and onSetContentHeight
 
    * fire 'onEndRender'	
+
 	
 ### Updating Children
 
-updateChildren(), called from render simply iterates through each child row calling child.set("item", currentItem); The child rows themselves are responsible for updating the html within those rows.
+    updateChildren(), called from render simply iterates through each child row calling child.set("item", currentItem); The child rows themselves are responsible for updating the html within those rows.
 
-## Events
+    ## Events
 
-* Internal Events
- * onStartRender
- * onSetColumnWidgets
- * onSetContentHeight
- * onEndRender
- * onStartLayout
+       * Internal Events
+         * onStartRender
+         * onSetColumnWidgets
+         * onSetContentHeight
+         * onEndRender
+         * onStartLayout
 	
-## Component Manager
+    ## Component Manager
 
-## Components
+    ## Components
 
 ### Scrollbar
 
