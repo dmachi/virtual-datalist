@@ -45,45 +45,45 @@ Most of the interface is via w.get/set.  The key properties are listed below
 
 *  set/get Properties
 
- *  topIndex 
+   *  topIndex 
 
-Set the topindex, which is essentially to say rerender with item X at the top
+      Set the topindex, which is essentially to say rerender with item X at the top
 
- *  offset 
+   *  offset 
 
-Offset the whole table by X pixels.  This allows the scrolling movement to achieve smooth scrolling
+      Offset the whole table by X pixels.  This allows the scrolling movement to achieve smooth scrolling
 
- *  structure 
+   *  structure 
 
-define the structure/configuration of the list
+      define the structure/configuration of the list
 
- *  items
+   *  items
 
-Set an array of objects (items for DataList) to render in this table.  This bypasses paged queries.
+      Set an array of objects (items for DataList) to render in this table.  This bypasses paged queries.
 
- *  query (DataList only) 
+   *  query (DataList only) 
 
-Set the query to be used when fetching data from the store.
+      Set the query to be used when fetching data from the store.
 
 *  get (readonly props)
 
- *  visibleRows 
+   *  visibleRows 
 
-The number of visibleRows(should always represent the number of children)
+      The number of visibleRows(should always represent the number of children)
 
- *  rowCount
+   *  rowCount
 
-The total number of data rows
+      The total number of data rows
 
- *  rowHeight
+   *  rowHeight
 
-All rows are the same height, this is calculated from the size of the first child and cached here for performance.
+      All rows are the same height, this is calculated from the size of the first child and cached here for performance.
 
 *  Instantiation Only
 
  *   estimatedRowHeight 
 
-An estimation of the height of each rows.  During the initial rendering, this value will be used to avoid calculating the height of an actual row.  This allows the correct number of rows to be created on a single pass, improving performance when provided.  It is strictly optional.
+     An estimation of the height of each rows.  During the initial rendering, this value will be used to avoid calculating the height of an actual row.  This allows the correct number of rows to be created on a single pass, improving performance when provided.  It is strictly optional.
 
 
 Components can expose additional methods and events.  The above is not a complete list, but rather a number of the key properties that are commonly used in the base widgets only.  
