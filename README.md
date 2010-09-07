@@ -20,7 +20,9 @@ VirtualLists are passed a structure definition which is used to control various 
             columns: [
                 {field: "id", label: "ID", className: "numberColumn"},
                 {field: "name", label: "Name", className: "descColumn"},
-                {field: "shortDesc", label: "Short Desc", type: "dojoc.dmachi.virtual.types.Widget", options: {dojoType: 'dijit.form.TextBox'}, className: "descColumn"}
+                {field: "shortDesc", label: "Short Desc", 
+			type: "dojoc.dmachi.virtual.types.Widget", 
+			options: {dojoType: 'dijit.form.TextBox'}, className: "descColumn"}
         },
 
         footer: {

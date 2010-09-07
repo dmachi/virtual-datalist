@@ -45,43 +45,43 @@ Most of the interface is via w.get/set.  The key properties are listed below
 
 *  set/get Properties
 
-**  topIndex 
+ *  topIndex 
 
 Set the topindex, which is essentially to say rerender with item X at the top
 
-**  offset 
+ *  offset 
 
 Offset the whole table by X pixels.  This allows the scrolling movement to achieve smooth scrolling
 
-**  structure 
+ *  structure 
 
 define the structure/configuration of the list
 
-**  items
+ *  items
 
 Set an array of objects (items for DataList) to render in this table.  This bypasses paged queries.
 
-**  query (DataList only) 
+ *  query (DataList only) 
 
 Set the query to be used when fetching data from the store.
 
 *  get (readonly props)
 
-**  visibleRows 
+ *  visibleRows 
 
 The number of visibleRows(should always represent the number of children)
 
-**  rowCount
+ *  rowCount
 
 The total number of data rows
 
-**  rowHeight
+ *  rowHeight
 
 All rows are the same height, this is calculated from the size of the first child and cached here for performance.
 
 *  Instantiation Only
 
-**   estimatedRowHeight 
+ *   estimatedRowHeight 
 
 An estimation of the height of each rows.  During the initial rendering, this value will be used to avoid calculating the height of an actual row.  This allows the correct number of rows to be created on a single pass, improving performance when provided.  It is strictly optional.
 
@@ -116,19 +116,19 @@ This is the standard LayoutWidget resize method, which triggers a call to layout
 
 The layout method ensures that the correct number of children exist (the number of fully visible rows + 3) by adding or removing from the existing set.  This is an asynchronous process currently to allow for rendering challenges in IE (TODO:see if it performs better making it sync again by inspecting offsetHeight).  An optional (but preferred) optimization for the initial rendering, is to provide the widget with an estimated row height, which allows the creation of all of the children at once.  If for some reason the value of this esitmate is incorrect, the widget will work fine, it will potentially be slightly slower for the initial rendering.  Upon completion of this process, the render() method is called, and finally it fires off an 'onSetViewportHeight' event.
 
-**  createRowComponents() does the work described above, and returns a deferred
+ *  createRowComponents() does the work described above, and returns a deferred
 		
-**  render()
+ *  render()
 
-*** Fire 'onStartRender'
+   * Fire 'onStartRender'
 
-*** Based on this.topIndex (index of the first item in the list), request a page of data to render (getDataPage()), return deferrred
+   * Based on this.topIndex (index of the first item in the list), request a page of data to render (getDataPage()), return deferrred
 
-** updateChildren() For Each child, tell it what item it now represents.
+   * updateChildren() For Each child, tell it what item it now represents.
 
-*** Based on the size of the children, fire onSetColumnWidths , and onSetContentHeight
+   * Based on the size of the children, fire onSetColumnWidths , and onSetContentHeight
 
-*** fire 'onEndRender'	
+   * fire 'onEndRender'	
 	
 ### Updating Children
 
@@ -137,11 +137,11 @@ updateChildren(), called from render simply iterates through each child row call
 ## Events
 
 * Internal Events
-** onStartRender
-** onSetColumnWidgets
-** onSetContentHeight
-** onEndRender
-** onStartLayout
+ * onStartRender
+ * onSetColumnWidgets
+ * onSetContentHeight
+ * onEndRender
+ * onStartLayout
 	
 ## Component Manager
 
