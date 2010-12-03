@@ -1,0 +1,83 @@
+.virtualList{
+	overflow: hidden;
+	margin: 0px;
+	padding: 0px;
+}
+
+.virtualListLayout {
+	width: 100%;
+	border-collapse: collapse;
+	border-spacing: 0px;
+	padding: 0px;
+	margin: 0px;
+	vertical-align: top;
+}
+
+
+.virtualScrollbar {
+	margin: 0px;
+	border: 0px;
+	padding: 0px;
+	vertical-align: top;
+	overflow: hidden;
+	width: 16px;
+}
+
+.virtualScrollBox {
+	overflow-x: hidden;
+	overflow-y: scroll;
+	padding: 0px;
+	margin: 0px;
+	height: 100%;
+	float: right;
+	border: 0px;
+}
+
+.virtualScrollFake {
+	width: 1px;
+	height: 0px;
+	padding: 0px;
+	margin: 0px;
+}
+
+.virtualListContainer {
+	overflow: hidden;
+	width: 99%;
+	vertical-align: top;
+}
+.virtualTable {
+	z-index: 1;
+}
+
+.virtualHeader table {
+	z-index: 2;	
+}
+.virtualTable,
+.virtualHeader table,
+.virtualFooter table {
+	border-collapse: collapse;
+	border-spacing: 0px;
+	padding: 0px;
+	margin: 0px;
+	width: 100%;
+	overflow-x: auto;
+	position: relative;
+}
+
+.virtualHeader th {
+	border-bottom: 2px solid black;
+	font-size: 1.2em;
+	background: #dedede;
+}
+
+.virtualListMessage {
+	display: none;
+}
+
+.virtualListMessage td {
+	text-align: center;
+	padding: 1em;
+	background-color: #fff;
+	position: relative;
+	display: block;
+}
