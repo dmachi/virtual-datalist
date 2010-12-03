@@ -50,8 +50,8 @@
 
 	<script type="text/javascript">
 		dojo.registerModulePath("virtual-datalist","../virtual-datalist/lib");
-		define("test",["dojo", "dijit","dojoc/dmachi/TestStore", "virtual-datalist/VirtualDataList","virtual-datalist/types", "dijit/layout/BorderContainer","dijit/layout/ContentPane","dojo/data/ItemFileReadStore", "dijit/layout/TabContainer", "dijit/layout/AccordionContainer","dojo.parser", "dijit.form.HorizontalSlider", "dijit.form.NumberSpinner", "dijit.form.Button", "dijit.form.FilteringSelect", "dijit.form.TextBox", "dojo.DeferredList"], function(dojo,dijit, TestStore, VirtualDataList,types) {
-
+		define("test",["dojo", "dijit","dojoc/dmachi/TestStore", "virtual-datalist/VirtualDataList","virtual-datalist/types", "dijit/layout/BorderContainer","dijit/layout/ContentPane","dojo/data/ItemFileReadStore", "dijit/layout/TabContainer", "dijit/layout/AccordionContainer","dojo.parser", "dijit.form.HorizontalSlider", "dijit.form.NumberSpinner", "dijit.form.Button", "dijit.form.FilteringSelect", "dijit.form.TextBox", "dojo.DeferredList", "dojo.store.Memory", "dojo.store.Observable"], function(dojo,dijit, TestStore, VirtualDataList,types) {
+		/*
 		// storeProfile defines an item template for our fake data/TestStore
 		var storeProfile = {
 			template: {
@@ -70,7 +70,44 @@
 
 		//the test store instantiation
 		dataStore = new dojoc.dmachi.TestStore({resultCount: 1000, latency: -1, profile: storeProfile});
+		*/
 
+	dataStore = dojo.store.Observable(new dojo.store.Memory({
+		data: [
+			{id: 1, name: "one", prime: false},
+			{id: 2, name: "two", even: true, prime: true},
+			{id: 3, name: "three", prime: true},
+			{id: 4, name: "four", even: true, prime: false},
+			{id: 5, name: "five", prime: true},
+			{id: 6, name: "one", prime: false},
+			{id: 7, name: "two", even: true, prime: true},
+			{id: 8, name: "three", prime: true},
+			{id: 9, name: "four", even: true, prime: false},
+			{id: 10, name: "five", prime: true},
+			{id: 11, name: "one", prime: false},
+			{id: 12, name: "two", even: true, prime: true},
+			{id: 13, name: "three", prime: true},
+			{id: 14, name: "four", even: true, prime: false},
+			{id: 15, name: "five", prime: true},
+			{id: 16, name: "one", prime: false},
+			{id: 17, name: "two", even: true, prime: true},
+			{id: 18, name: "three", prime: true},
+			{id: 19, name: "four", even: true, prime: false},
+			{id: 20, name: "five", prime: true},
+			{id: 21, name: "five", prime: true},
+			{id: 21, name: "one", prime: false},
+			{id: 22, name: "two", even: true, prime: true},
+			{id: 23, name: "three", prime: true},
+			{id: 24, name: "four", even: true, prime: false},
+			{id: 25, name: "five", prime: true},
+			{id: 26, name: "one", prime: false},
+			{id: 27, name: "two", even: true, prime: true},
+			{id: 28, name: "three", prime: true},
+			{id: 29, name: "four", even: true, prime: false},
+			{id: 30, name: "five", prime: true}
+	
+		]
+	}));
 		// structure/layout of the grid
 	   	dynStruct={
 	                header: {
@@ -81,10 +118,10 @@
 				className: "virtualRow",
 				columns: [
 					{field: "id", label: "ID", className: "numberColumn"},
-					{field: "name", label: "Name", className: "descColumn"},
-					{field: "shortDesc", label: "Short Desc", options: {dojoType: 'dijit.form.TextBox'}, className: "descColumn"},
+					{field: "name", label: "Name", className: "descColumn"}
+					/*{field: "shortDesc", label: "Short Desc", options: {dojoType: 'dijit.form.TextBox'}, className: "descColumn"},
 					{field: "url",label: "URL", type: "types.tag.A", options: {property: "name"}, className: "urlColumn"}
-					/*
+					
 					{field: "X", label: "X", type: "types.Widget", options: {dojoType: 'dijit.form.NumberSpinner', style: "width: 60px;"}, className: "numberColumn"},
 					{field: "Y", label: "Y", type: "types.Widget", options: {dojoType: 'dijit.form.NumberSpinner', style: "width: 60px;"}, className: "numberColumn"},
 					{field: "Z", label: "Z", type: "types.Widget", options: {dojoType: 'dijit.form.NumberSpinner', style: "width: 60px;"}, className: "numberColumn"}
