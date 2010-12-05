@@ -51,103 +51,67 @@
 	<script type="text/javascript">
 		dojo.registerModulePath("virtual-datalist","../virtual-datalist/lib");
 		define("test",["dojo", "dijit","dojoc/dmachi/TestStore", "virtual-datalist/VirtualDataList","virtual-datalist/types", "dijit/layout/BorderContainer","dijit/layout/ContentPane","dojo/data/ItemFileReadStore", "dijit/layout/TabContainer", "dijit/layout/AccordionContainer","dojo.parser", "dijit.form.HorizontalSlider", "dijit.form.NumberSpinner", "dijit.form.Button", "dijit.form.FilteringSelect", "dijit.form.TextBox", "dojo.DeferredList", "dojo.store.Memory", "dojo.store.Observable"], function(dojo,dijit, TestStore, VirtualDataList,types) {
-		/*
-		// storeProfile defines an item template for our fake data/TestStore
-		var storeProfile = {
-			template: {
-				id: "${index}",
-				name: "ITEM ${index}",
-				shortDesc: "${index} Short Description",
-				url: "http://foo.bar.com${index}.html"
-			},
-			genNumericData: function(index,item){
-				item.X = Math.round(Math.random() * 100);
-				item.Y = Math.round(Math.random() * 100);
-				item.Z = Math.round(Math.random() * 100);
-				item.volume = Math.round(Math.random() * 100);
-			}
-		}
 
-		//the test store instantiation
-		dataStore = new dojoc.dmachi.TestStore({resultCount: 1000, latency: -1, profile: storeProfile});
-		*/
 
-	dataStore = dojo.store.Observable(new dojo.store.Memory({
-		data: [
-			{id: 1, name: "one", prime: false},
-			{id: 2, name: "two", even: true, prime: true},
-			{id: 3, name: "three", prime: true},
-			{id: 4, name: "four", even: true, prime: false},
-			{id: 5, name: "five", prime: true},
-			{id: 6, name: "one", prime: false},
-			{id: 7, name: "two", even: true, prime: true},
-			{id: 8, name: "three", prime: true},
-			{id: 9, name: "four", even: true, prime: false},
-			{id: 10, name: "five", prime: true},
-			{id: 11, name: "one", prime: false},
-			{id: 12, name: "two", even: true, prime: true},
-			{id: 13, name: "three", prime: true},
-			{id: 14, name: "four", even: true, prime: false},
-			{id: 15, name: "five", prime: true},
-			{id: 16, name: "one", prime: false},
-			{id: 17, name: "two", even: true, prime: true},
-			{id: 18, name: "three", prime: true},
-			{id: 19, name: "four", even: true, prime: false},
-			{id: 20, name: "five", prime: true},
-			{id: 21, name: "five", prime: true},
-			{id: 21, name: "one", prime: false},
-			{id: 22, name: "two", even: true, prime: true},
-			{id: 23, name: "three", prime: true},
-			{id: 24, name: "four", even: true, prime: false},
-			{id: 25, name: "five", prime: true},
-			{id: 26, name: "one", prime: false},
-			{id: 27, name: "two", even: true, prime: true},
-			{id: 28, name: "three", prime: true},
-			{id: 29, name: "four", even: true, prime: false},
-			{id: 30, name: "five", prime: true}
-	
-		]
-	}));
-		// structure/layout of the grid
-	   	dynStruct={
-	                header: {
-				className: "virtualHeader"
-			},
-
-			row: {
-				className: "virtualRow",
-				columns: [
-					{field: "id", label: "ID", className: "numberColumn"},
-					{field: "name", label: "Name", className: "descColumn"}
-					/*{field: "shortDesc", label: "Short Desc", options: {dojoType: 'dijit.form.TextBox'}, className: "descColumn"},
-					{field: "url",label: "URL", type: "types.tag.A", options: {property: "name"}, className: "urlColumn"}
-					
-					{field: "X", label: "X", type: "types.Widget", options: {dojoType: 'dijit.form.NumberSpinner', style: "width: 60px;"}, className: "numberColumn"},
-					{field: "Y", label: "Y", type: "types.Widget", options: {dojoType: 'dijit.form.NumberSpinner', style: "width: 60px;"}, className: "numberColumn"},
-					{field: "Z", label: "Z", type: "types.Widget", options: {dojoType: 'dijit.form.NumberSpinner', style: "width: 60px;"}, className: "numberColumn"}
-					{field: "volume", label: "Volume", type: "types.Widget", options: {dojoType: 'dijit.form.HorizontalSlider', style: "width: 100%;", minimum: 0, maximum: 100, steps: 10}, className: "sliderColumn"}, */
-	                        ]
-	                },
-
-			footer: {
-				className: "virtualFooter"
-			}
-	        }
-
-		dojo.addOnLoad(function(){
-
-			//add VDL and types to the global namespace so they are available to the parser and the dynStruct config processor
-			dojo.global.VirtualDataList=VirtualDataList;
-			dojo.global.types = types;
-			console.log("addOnLoad()", VirtualDataList);
-			dojo.parser.parse();
-
-			dojo.connect(dijit.byId("datalist"), "onVirtualRowClick", function(rowIndex, item, rawEvent){
-				console.log("onVirtualRowClick() ", arguments);
-			});
+	//create 'numItems' test data items for the store
+	var numItems = 30000;
+	var data = []
+	for (var i=0;i<numItems;i++){
+		data.push({
+			id: i,
+			name: "Item " + i,
+			description: "Description of Item Number " + i,
+			url: "http://bobloblob.com?item=" + i,
+			propA:  Math.round(Math.random() * 100),
+			propB:  Math.round(Math.random() * 100),
+			propC:  Math.round(Math.random() * 100)
 		});
-		
+	}
+
+	//Instantiate the data store
+	dataStore = dojo.store.Observable(new dojo.store.Memory({data:data}));
+
+	// define layout of the grid
+   	dynStruct={
+                header: {
+			className: "virtualHeader"
+		},
+
+		row: {
+			className: "virtualRow",
+			columns: [
+				{field: "id", label: "ID", className: "numberColumn"},
+				{field: "name", label: "Name", className: "descColumn"},
+				{field: "description", label: "Short Desc", options: {dojoType: 'dijit.form.TextBox'}, className: "descColumn"}
+				/*{field: "url",label: "URL", type: "types.tag.A", options: {property: "name"}, className: "urlColumn"}
+				
+				{field: "propA", label: "X", type: "types.Widget", options: {dojoType: 'dijit.form.NumberSpinner', style: "width: 60px;"}, className: "numberColumn"},
+				{field: "propB", label: "Y", type: "types.Widget", options: {dojoType: 'dijit.form.NumberSpinner', style: "width: 60px;"}, className: "numberColumn"},
+				{field: "propC", label: "Z", type: "types.Widget", options: {dojoType: 'dijit.form.NumberSpinner', style: "width: 60px;"}, className: "numberColumn"}
+				{field: "volume", label: "Volume", type: "types.Widget", options: {dojoType: 'dijit.form.HorizontalSlider', style: "width: 100%;", minimum: 0, maximum: 100, steps: 10}, className: "sliderColumn"}, */
+                        ]
+                },
+
+		footer: {
+			className: "virtualFooter"
+		}
+        }
+
+	dojo.addOnLoad(function(){
+
+		//add VDL and types to the global namespace so they are available to the parser and the dynStruct config processor
+		dojo.global.VirtualDataList=VirtualDataList;
+		dojo.global.types = types;
+
+		//call the parser;
+		dojo.parser.parse();
+
+		dojo.connect(dijit.byId("datalist"), "onVirtualRowClick", function(rowIndex, item, rawEvent){
+			console.log("onVirtualRowClick() ", arguments);
+		});
 	});
+	
+});
 	</script>
 </head>
 <body class="tundra">
